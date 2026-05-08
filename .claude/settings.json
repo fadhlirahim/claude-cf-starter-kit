@@ -1,0 +1,165 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bun run *)",
+      "Bash(bun test*)",
+      "Bash(bun install*)",
+      "Bash(bun add*)",
+      "Bash(bun remove*)",
+      "Bash(bunx biome*)",
+      "Bash(bunx drizzle-kit*)",
+      "Bash(bunx @better-auth/cli*)",
+      "Bash(bunx shadcn*)",
+      "Bash(wrangler types*)",
+      "Bash(wrangler dev*)",
+      "Bash(wrangler tail*)",
+      "Bash(wrangler whoami*)",
+      "Bash(wrangler d1 list*)",
+      "Bash(wrangler d1 info*)",
+      "Bash(wrangler d1 migrations list*)",
+      "Bash(wrangler d1 migrations apply * --local*)",
+      "Bash(wrangler d1 execute * --local*)",
+      "Bash(wrangler r2 bucket list*)",
+      "Bash(wrangler kv namespace list*)",
+      "Bash(wrangler ai gateway *)",
+      "Bash(npx wrangler types*)",
+      "Bash(npx wrangler dev*)",
+      "Bash(npx wrangler tail*)",
+      "Bash(npx wrangler whoami*)",
+      "Bash(npx wrangler d1 list*)",
+      "Bash(npx wrangler d1 info*)",
+      "Bash(npx wrangler d1 migrations list*)",
+      "Bash(npx wrangler d1 migrations apply * --local*)",
+      "Bash(npx wrangler d1 execute * --local*)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git add*)",
+      "Bash(git commit*)",
+      "Bash(git branch*)",
+      "Bash(git checkout*)",
+      "Bash(git stash*)",
+      "Bash(git push*)",
+      "Bash(git fetch*)",
+      "Bash(git worktree*)",
+      "Bash(git init*)",
+      "Bash(gh pr *)",
+      "Bash(gh pr create*)",
+      "Bash(gh pr view*)",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__query-docs"
+    ],
+    "deny": [
+      "Bash(rm -rf /)",
+      "Bash(rm -rf ~)",
+      "Bash(rm -rf /*)",
+      "Bash(git push --force*)",
+      "Bash(git reset --hard*)",
+      "Bash(git clean -f*)",
+      "Bash(wrangler d1 execute * --remote*)",
+      "Bash(npx wrangler d1 execute * --remote*)",
+      "Bash(wrangler secret delete*)",
+      "Bash(npx wrangler secret delete*)",
+      "Bash(wrangler delete*)",
+      "Bash(npx wrangler delete*)",
+      "Bash(wrangler r2 bucket delete*)",
+      "Bash(npx wrangler r2 bucket delete*)",
+      "Bash(wrangler d1 delete*)",
+      "Bash(npx wrangler d1 delete*)"
+    ]
+  },
+  "enabledPlugins": {
+    "code-review@claude-plugins-official": true,
+    "code-simplifier@claude-plugins-official": true,
+    "ralph-loop@claude-plugins-official": true
+  },
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/git-context.sh",
+            "timeout": 10000
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/protect-sensitive.sh",
+            "timeout": 10000
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/auto-format.sh",
+            "timeout": 30000
+          },
+          {
+            "type": "command",
+            "command": ".claude/hooks/db-schema-reminder.sh",
+            "timeout": 10000
+          },
+          {
+            "type": "command",
+            "command": ".claude/hooks/cf-binding-reminder.sh",
+            "timeout": 10000
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "permission_prompt",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/notify-macos.sh",
+            "timeout": 10000
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/session-context.sh",
+            "timeout": 10000
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/post-implement-review.sh",
+            "timeout": 15000
+          },
+          {
+            "type": "command",
+            "command": ".claude/hooks/stop-notify.sh",
+            "timeout": 10000
+          }
+        ]
+      }
+    ]
+  }
+}
