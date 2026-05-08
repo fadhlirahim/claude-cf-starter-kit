@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+.output/
+
+# Cloudflare local state
+.wrangler/
+
+# CF-generated binding types — regenerate with `bun cf-typegen`
+worker-configuration.d.ts
+
+# TanStack Router codegen
+routeTree.gen.ts
+
+# Local secrets (Cloudflare's .dev.vars)
+.dev.vars
+.dev.vars.*
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Drizzle metadata
+drizzle/meta/
+
+# Test
+coverage/
+
+# Misc
+*.log

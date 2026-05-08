@@ -1,0 +1,22 @@
+{
+  "name": "claude-cloudflare-starter-kit-target",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev",
+    "prepare": "lefthook install",
+    "build": "vite build",
+    "deploy": "vite build && wrangler deploy",
+    "deploy:stg": "WRANGLER_ENV=stg vite build && wrangler deploy --env stg",
+    "check": "bunx biome check .",
+    "check:fix": "bunx biome check --write .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "cf-typegen": "wrangler types",
+    "db:generate": "bunx drizzle-kit generate",
+    "db:migrate:local": "wrangler d1 migrations apply DB --local",
+    "db:migrate:remote": "wrangler d1 migrations apply DB --remote",
+    "db:auth": "bunx @better-auth/cli@latest generate"
+  }
+}
