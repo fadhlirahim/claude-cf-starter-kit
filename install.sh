@@ -2,7 +2,7 @@
 # Install the Claude Cloudflare Starter Kit into the current (or specified) project directory.
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/fadhlirahim/claude-cloudflare-starter-kit/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/fadhlirahim/claude-cf-starter-kit/main/install.sh | bash
 #   curl -fsSL .../install.sh | bash -s -- /path/to/project
 #   bash install.sh [target-dir]
 #
@@ -17,7 +17,7 @@
 
 set -euo pipefail
 
-REPO_URL="https://github.com/fadhlirahim/claude-cloudflare-starter-kit.git"
+REPO_URL="https://github.com/fadhlirahim/claude-cf-starter-kit.git"
 REPO_BRANCH="main"
 
 # ---- helpers ----------------------------------------------------------------

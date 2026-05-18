@@ -157,21 +157,21 @@ Shell scripts in `.claude/hooks/` wired to lifecycle events in `settings.json`. 
 The fastest way is the install script. It works for both fresh projects and existing repos. Run it from the directory you want the kit applied to:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/fadhlirahim/claude-cloudflare-starter-kit/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/fadhlirahim/claude-cf-starter-kit/main/install.sh | bash
 ```
 
 Or pass a target directory:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/fadhlirahim/claude-cloudflare-starter-kit/main/install.sh | bash -s -- /path/to/your-project
+curl -fsSL https://raw.githubusercontent.com/fadhlirahim/claude-cf-starter-kit/main/install.sh | bash -s -- /path/to/your-project
 ```
 
 Prefer to inspect first? Clone and run locally:
 
 ```bash
-git clone https://github.com/fadhlirahim/claude-cloudflare-starter-kit.git
+git clone https://github.com/fadhlirahim/claude-cf-starter-kit.git
 cd /path/to/your-project
-bash /path/to/claude-cloudflare-starter-kit/install.sh
+bash /path/to/claude-cf-starter-kit/install.sh
 ```
 
 ### What the installer does
