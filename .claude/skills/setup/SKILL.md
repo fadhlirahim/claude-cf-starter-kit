@@ -62,6 +62,7 @@ Two groups so failures are easy to diagnose:
 # runtime
 bun add \
   @tanstack/react-router @tanstack/react-router-devtools \
+  @tanstack/react-router-ssr-query \
   @tanstack/react-start \
   @tanstack/react-query @tanstack/react-query-devtools \
   @tanstack/react-form @tanstack/zod-adapter \
@@ -495,35 +496,34 @@ export const chat = createServerFn({ method: 'POST' })
 ### `src/router.tsx`
 
 ```tsx
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { QueryClient } from '@tanstack/react-query'
 import { createRouter } from '@tanstack/react-router'
+import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query'
 import { routeTree } from './routeTree.gen'
 
-function makeQueryClient() {
-  return new QueryClient({
+export function getRouter() {
+  // New QueryClient per call. getRouter() runs once per request on the server
+  // and once on the client, so this is already per-request-safe — a module-level
+  // singleton would leak one user's cache into another's SSR.
+  const queryClient = new QueryClient({
     defaultOptions: { queries: { staleTime: 60 * 1000 } },
   })
-}
 
-let browserQueryClient: QueryClient | undefined
-
-function getQueryClient() {
-  if (typeof window === 'undefined') return makeQueryClient()
-  if (!browserQueryClient) browserQueryClient = makeQueryClient()
-  return browserQueryClient
-}
-
-export function getRouter() {
-  const queryClient = getQueryClient()
-  return createRouter({
+  const router = createRouter({
     routeTree,
     defaultPreload: 'intent',
+    defaultPreloadStaleTime: 0, // Query owns caching/staleness, not the router
     scrollRestoration: true,
     context: { queryClient },
-    Wrap: function WrapComponent({ children }) {
-      return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    },
   })
+
+  // Wires dehydrate -> stream -> hydrate of the Query cache across the SSR
+  // boundary, plus redirect() handling and the QueryClientProvider wrap.
+  // WITHOUT this, loader `ensureQueryData` prefetches never reach the client
+  // and every server-fetched query refetches on hydration (silent double fetch).
+  setupRouterSsrQueryIntegration({ router, queryClient })
+
+  return router
 }
 
 declare module '@tanstack/react-router' {
@@ -532,6 +532,10 @@ declare module '@tanstack/react-router' {
   }
 }
 ```
+
+> Requires `@tanstack/react-router-ssr-query`. The manual `Wrap` + `QueryClientProvider`
+> pattern makes Query *run* but does NOT serialize the server cache into the HTML —
+> use the integration helper so SSR data loading actually works end to end.
 
 ### `src/routes/__root.tsx`
 

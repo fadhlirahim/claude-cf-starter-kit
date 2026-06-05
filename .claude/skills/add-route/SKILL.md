@@ -16,37 +16,60 @@ Add a route: **$ARGUMENTS**
    - Dynamic param: `src/routes/<path>/$<param>.tsx` (e.g., `src/routes/posts/$id.tsx`)
    - API endpoint: see `/add-server-fn` instead
 
-2. **Skeleton**:
+2. **Pick a data-loading shape** (all three are valid — choose by whether the route needs a client cache):
 
-```tsx
-import { createFileRoute } from '@tanstack/react-router'
-import { z } from 'zod/v4'
-import { fallback, zodValidator } from '@tanstack/zod-adapter'
+   **A. Read-once, no client cache** — return data straight from the loader. Simplest, fully SSR'd.
 
-// (Optional) typed search params
-const searchSchema = z.object({
-  page: fallback(z.number(), 1).default(1),
-})
+   ```tsx
+   export const Route = createFileRoute('/<route-path>')({
+     loader: () => listThings(), // a server fn
+     component: PageComponent,
+   })
 
-export const Route = createFileRoute('/<route-path>')({
-  validateSearch: zodValidator(searchSchema),
-  // (Optional) prefetch data for SSR
-  loader: async ({ context }) => {
-    // context.queryClient.ensureQueryData({ queryKey: [...], queryFn: () => myServerFn(...) })
-  },
-  component: PageComponent,
-})
+   function PageComponent() {
+     const things = Route.useLoaderData()
+     return <main>...</main>
+   }
+   ```
 
-function PageComponent() {
-  const { page } = Route.useSearch()
-  return <main>...</main>
-}
-```
+   **B. Cached + interactive (default)** — `ensureQueryData` in the loader, `useSuspenseQuery` in the component. Factor the shared key + fetcher into one `queryOptions` so both hit the same cache entry. Use this when the page mutates data, needs invalidation, or background refetch.
+
+   ```tsx
+   import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
+   import { createFileRoute } from '@tanstack/react-router'
+   import { getThing } from '@/server/services/get-thing.server'
+
+   const thingQueryOptions = (id: string) =>
+     queryOptions({ queryKey: ['thing', id], queryFn: () => getThing({ data: { id } }) })
+
+   export const Route = createFileRoute('/things/$id')({
+     loader: ({ context, params }) => context.queryClient.ensureQueryData(thingQueryOptions(params.id)),
+     component: PageComponent,
+   })
+
+   function PageComponent() {
+     const { id } = Route.useParams()
+     const { data } = useSuspenseQuery(thingQueryOptions(id))
+     return <main>...</main>
+   }
+   ```
+
+   For non-blocking prefetch (component renders a loading state while data streams in), swap `ensureQueryData` for `prefetchQuery` and drop the `await`.
+
+   Typed search params work with either shape:
+
+   ```tsx
+   import { z } from 'zod/v4'
+   import { fallback, zodValidator } from '@tanstack/zod-adapter'
+
+   const searchSchema = z.object({ page: fallback(z.number(), 1).default(1) })
+   // validateSearch: zodValidator(searchSchema) inside the route options
+   ```
 
 3. **Loader vs `beforeLoad`**:
    - `beforeLoad`: auth guards, context augmentation, redirects.
-   - `loader`: data prefetching for SSR. Use `queryClient.ensureQueryData()` so the data participates in streaming.
-   - Plain `useQuery` does NOT participate in SSR — use `useSuspenseQuery` if SSR matters.
+   - `loader`: data fetching/prefetching for SSR.
+   - IMPORTANT: plain `useQuery` does NOT execute on the server — the HTML ships with a loading state. Use `useSuspenseQuery` (shape B) or a plain loader return (shape A) for anything server-rendered. This relies on `setupRouterSsrQueryIntegration` already being wired in `src/router.tsx`.
 
 4. **For protected routes**, the `_authed.tsx` layout handles `beforeLoad`. You don't need to duplicate the session check.
 

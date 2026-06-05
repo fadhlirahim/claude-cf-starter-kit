@@ -156,6 +156,34 @@ export const getPost = createServerFn({ method: 'GET' })
 - Loader vs `beforeLoad`: loader for data prefetching, `beforeLoad` for auth guards and context augmentation.
 - Use `notFound()` from `@tanstack/react-router` to throw 404s in loaders.
 
+### Data Loading (SSR)
+
+The router is wired to TanStack Query via `setupRouterSsrQueryIntegration` in `src/router.tsx`. That helper — NOT a manual `QueryClientProvider` — is what dehydrates the server cache, streams it into the HTML, and rehydrates it on the client. Pick one of three patterns per route:
+
+| Case | Pattern | When |
+|------|---------|------|
+| Read-once, no client cache | `loader` returns data → `Route.useLoaderData()` | Static/marketing pages. No Query at all. |
+| Cached + interactive (blocking) | `ensureQueryData` in `loader` → `useSuspenseQuery` in component | **Default** for app pages. Component needs data to render; no loading flash. |
+| Cached + non-blocking | `prefetchQuery` in `loader` → `useSuspenseQuery`/`useQuery` | Data is nice-to-have; component renders a loading state while it streams in. |
+
+- IMPORTANT: `ensureQueryData` BLOCKS render until data is cached; `prefetchQuery` starts the fetch WITHOUT blocking. Both participate in SSR streaming.
+- Factor the shared key + fetcher into a `queryOptions(...)` helper and pass the SAME object to the loader and the component — that's what guarantees loader and `useSuspenseQuery` hit one cache entry instead of drifting.
+
+```ts
+const postQueryOptions = (id: string) =>
+  queryOptions({ queryKey: ['post', id], queryFn: () => getPost({ data: { id } }) })
+
+export const Route = createFileRoute('/posts/$id')({
+  loader: ({ context, params }) => context.queryClient.ensureQueryData(postQueryOptions(params.id)),
+  component: PostPage,
+})
+
+function PostPage() {
+  const { id } = Route.useParams()
+  const { data } = useSuspenseQuery(postQueryOptions(id))
+}
+```
+
 ### Cloudflare Bindings — Access Pattern
 
 - Bindings (D1, R2, KV, AI, Workflows, Email, Service) are typed via `worker-configuration.d.ts`. Regenerate with `bun cf-typegen` after editing `wrangler.jsonc`.
@@ -264,6 +292,8 @@ export const getPost = createServerFn({ method: 'GET' })
 - Don't bypass AI Gateway. No direct provider URLs in code; route through the gateway baseURL or the `gateway` option on `env.AI.run`.
 - Don't use `useEffect` for data fetching. Server functions + TanStack Query.
 - Don't use `useState` for server state. Server functions + TanStack Query.
+- Don't use `useQuery` for data you want server-rendered — it does NOT execute on the server, so the HTML ships with a loading state. Use `useSuspenseQuery` (or a plain loader return).
+- Don't wire Query with a manual `QueryClientProvider` and skip `setupRouterSsrQueryIntegration`. Without the integration, loader `ensureQueryData` prefetches never reach the client and every query refetches on hydration — a silent double fetch.
 - Don't use bare `zod` import — always `zod/v4`.
 - Don't use `.merge()` (Zod 4 removed it). Use `.extend()`.
 - Don't use `.format()` / `.flatten()` on `ZodError`. Use `z.treeifyError()`.
