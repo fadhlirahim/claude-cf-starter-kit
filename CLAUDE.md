@@ -16,6 +16,7 @@
 | Database | Drizzle ORM + Cloudflare D1 (SQLite) | orm.drizzle.team |
 | Storage | Cloudflare R2 | bucket binding, signed URLs |
 | Async | Cloudflare Workflows | `WorkflowEntrypoint` class per workflow |
+| Realtime | Durable Objects + WebSockets (opt-in via `/add-realtime`) | `useSyncedState` hook; hibernation API |
 | Cron | wrangler `triggers.crons` + `scheduled` handler | dispatch by `event.cron` |
 | Email | Cloudflare Email Sending (`send_email` binding) | DKIM/SPF/DMARC managed by CF |
 | AI | Workers AI binding via AI Gateway | also fronts `@ai-sdk/openai`, `@ai-sdk/google` |
@@ -237,6 +238,14 @@ function PostPage() {
 - Wrap each retryable side effect in `step.do('step-name', { retries }, async () => ...)`. Each `step.do` is checkpointed — failures replay from the last successful step.
 - Trigger: `await env.MY_WORKFLOW.create({ id, params })`. The `id` MUST be deterministic if the trigger is idempotent (e.g., `pipeline-${orgId}-${event.scheduledTime}`); CF rejects duplicate IDs.
 - Long-running steps use `step.sleep('wait', '5 minutes')` or `step.sleepUntil('cutoff', new Date(...))`. Don't spin in a loop.
+
+### Realtime (Durable Objects)
+
+- Opt-in via `/add-realtime`. Not in the base kit — only present once that skill has run. A single `SyncRoom` DO (extends `DurableObject<Env>`, NAMED export from `src/entry.server.ts`) partitions rooms by `idFromName`; the `useSyncedState(room, key, initial)` hook is a drop-in for `useState` that syncs across clients.
+- IMPORTANT: always use the WebSocket Hibernation API (`ctx.acceptWebSocket` + `webSocketMessage`/`webSocketClose` methods). NEVER `server.accept()` — it keeps the DO resident and billed for the whole connection.
+- The WS upgrade is handled in the `fetch` of `src/entry.server.ts` BEFORE the Start handler (a `101` upgrade can't be a server function). Authenticate at the upgrade and namespace room IDs by tenant.
+- Semantics are last-write-wins (the DO is single-threaded, so it's the total-order serialization point). NOT a CRDT — don't use it for collaborative text editing.
+- The WS subscription in the hook is the one sanctioned `useEffect` — it's a subscription, not data fetching.
 
 ### Cron / Scheduled
 
