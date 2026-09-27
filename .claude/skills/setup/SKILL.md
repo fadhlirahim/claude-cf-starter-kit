@@ -16,6 +16,7 @@ Run only when `src/` does not yet exist. If it does, **stop and ask** — the us
 1. Verify tools:
    - `bun --version` (>= 1.1)
    - `git --version`
+   - The project root must be its own git repo (`git rev-parse --show-toplevel` equals the cwd). If not, `git init` first — `bun add` runs the `prepare` script (`lefthook install`), which otherwise installs hooks into whatever repo encloses the directory.
    - `wrangler whoami` — confirms a logged-in CF account. If not logged in, tell the user to run `wrangler login` and stop.
 2. Ask the user:
    - **App name** (replaces `[App Name]` in `CLAUDE.md` and becomes the Worker name in `wrangler.jsonc`).
