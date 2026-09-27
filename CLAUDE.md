@@ -213,6 +213,7 @@ function PostPage() {
 - Single `createAuth(d1)` factory in `src/server/auth.ts`. Options and plugins live in `src/server/auth.options.ts` (no `cloudflare:workers` import) so the app and the CLI share them. Plugin chain: domain plugins (admin, organization, …) THEN `tanstackStartCookies()` LAST.
 - The better-auth CLI can't call a factory, so `bun db:auth` reads `src/server/auth.cli.ts` — a static instance over a dummy D1 handle. Never import it from app code.
 - The secret comes from a CF secret, not from `wrangler.jsonc` vars: `(env as unknown as Record<string, string>).BETTER_AUTH_SECRET`. Set with `wrangler secret put BETTER_AUTH_SECRET`.
+- Pass `baseURL: env.BETTER_AUTH_URL` explicitly in `createAuth`. It's a public `vars` entry holding the production origin, overridden in `.dev.vars` with `http://localhost:5173`. Without it better-auth guesses the origin from each request and warns that callbacks and redirects may break.
 - `src/lib/auth-client.ts`: `createAuthClient` from `better-auth/react` with `inferAdditionalFields<typeof auth>()`.
 - `src/server/auth.functions.ts`: `getSession` and `ensureSession` server functions. ALWAYS pass `getRequestHeaders()` to `auth.api.getSession({ headers })` — without it the session appears anonymous.
 - API handler at `src/routes/api/auth/$.ts` — catch-all route mounting `auth.handler`.

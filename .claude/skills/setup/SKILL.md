@@ -152,7 +152,8 @@ wrangler ai gateway create <slug>
   },
   "vars": {
     "AI_GATEWAY_ID": "<gateway-slug>",
-    "APP_URL": "http://localhost:5173"
+    // Public origin better-auth builds URLs from. .dev.vars overrides it locally.
+    "BETTER_AUTH_URL": "https://<your-domain>"
   },
   "d1_databases": [
     {
@@ -180,6 +181,7 @@ wrangler ai gateway create <slug>
 ```bash
 cat > .dev.vars <<'EOF'
 BETTER_AUTH_SECRET=<run: openssl rand -base64 32>
+BETTER_AUTH_URL=http://localhost:5173
 CLOUDFLARE_ACCOUNT_ID=<from wrangler whoami>
 # Optional, only if you'll use AI SDK with OpenAI/Google through the gateway:
 # OPENAI_API_KEY=
@@ -394,6 +396,8 @@ export function createAuth(d1: D1Database) {
   return betterAuth({
     ...authOptions,
     secret,
+    // Pass explicitly: better-auth would otherwise read process.env, which this stack doesn't use.
+    baseURL: env.BETTER_AUTH_URL,
     database: drizzleAdapter(db, { provider: 'sqlite', schema }),
   })
 }
