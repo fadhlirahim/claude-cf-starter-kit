@@ -1,13 +1,10 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.0.0/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.5.14/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
     "useIgnoreFile": true,
     "defaultBranch": "main"
-  },
-  "organizeImports": {
-    "enabled": true
   },
   "formatter": {
     "enabled": true,
@@ -46,10 +43,9 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true,
+      "preset": "recommended",
       "complexity": {
         "noExtraBooleanCast": "error",
-        "noMultipleSpacesInRegularExpressionLiterals": "error",
         "noUselessCatch": "error",
         "noUselessTypeConstraint": "error",
         "noUselessFragments": "error",
@@ -58,7 +54,8 @@
         "noExcessiveCognitiveComplexity": {
           "level": "warn",
           "options": { "maxAllowedComplexity": 15 }
-        }
+        },
+        "noAdjacentSpacesInRegex": "error"
       },
       "correctness": {
         "noUnusedVariables": "error",
@@ -78,8 +75,8 @@
       "suspicious": {
         "noExplicitAny": "error",
         "noArrayIndexKey": "warn",
-        "noConsoleLog": "warn",
-        "noDoubleEquals": "error"
+        "noDoubleEquals": "error",
+        "noConsole": { "level": "warn", "options": { "allow": ["error", "warn", "info"] } }
       },
       "nursery": {
         "useSortedClasses": "warn",
@@ -103,7 +100,7 @@
   },
   "overrides": [
     {
-      "include": ["src/routes/**"],
+      "includes": ["**/src/routes/**"],
       "linter": {
         "rules": {
           "style": {
@@ -113,7 +110,7 @@
       }
     },
     {
-      "include": ["src/entry.server.ts"],
+      "includes": ["**/src/entry.server.ts"],
       "linter": {
         "rules": {
           "style": {
@@ -123,7 +120,7 @@
       }
     },
     {
-      "include": ["*.config.ts", "*.config.js"],
+      "includes": ["**/*.config.ts", "**/*.config.js"],
       "linter": {
         "rules": {
           "style": {
@@ -133,27 +130,27 @@
       }
     },
     {
-      "include": ["*.test.ts", "*.test.tsx", "*.spec.ts", "*.spec.tsx"],
+      "includes": ["**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "**/*.spec.tsx"],
       "linter": {
         "rules": {
           "suspicious": {
-            "noConsoleLog": "off"
+            "noConsole": "off"
           }
         }
       }
     },
     {
-      "include": ["scripts/**"],
+      "includes": ["**/scripts/**"],
       "linter": {
         "rules": {
           "suspicious": {
-            "noConsoleLog": "off"
+            "noConsole": "off"
           }
         }
       }
     },
     {
-      "include": ["src/components/ui/**"],
+      "includes": ["**/src/components/ui/**"],
       "linter": {
         "rules": {
           "nursery": {
@@ -167,15 +164,16 @@
     }
   ],
   "files": {
-    "ignore": [
-      "node_modules",
-      "dist",
-      ".output",
-      ".wrangler",
-      "*.gen.ts",
-      "routeTree.gen.ts",
-      "worker-configuration.d.ts",
-      "drizzle"
+    "includes": [
+      "**",
+      "!**/node_modules",
+      "!**/dist",
+      "!**/.output",
+      "!**/.wrangler",
+      "!**/*.gen.ts",
+      "!**/routeTree.gen.ts",
+      "!**/worker-configuration.d.ts",
+      "!**/drizzle"
     ]
   }
 }
