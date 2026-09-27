@@ -22,8 +22,8 @@ Write or run tests for: $ARGUMENTS
 
 ```typescript
 import { describe, it, expect, beforeEach } from 'vitest'
-import { env } from 'cloudflare:test'
-import { getPost } from './get-post.server'
+import { env } from 'cloudflare:workers'
+import { getPost } from './get-post.functions'
 
 describe('getPost', () => {
   beforeEach(async () => {

@@ -12,8 +12,9 @@ Server functions are the API layer in this stack — there is no tRPC. Each func
 ## Process
 
 1. **Decide location**:
-   - Domain logic: `src/server/<domain>/<name>.server.ts`
-   - Co-located with a route: `src/routes/<route>.<name>.server.ts` is fine for narrow use
+   - `src/server/<domain>/<name>.functions.ts` — the `createServerFn` wrapper, safe to import from routes.
+   - Server-only helpers it calls (queries, internal logic) go in `<name>.server.ts`. TanStack Start's import protection fails the build if client code imports any `*.server.*` file.
+   - Don't put it under `src/routes/` — every file there is treated as a route.
 2. **Pick the method**:
    - `GET` for reads — cacheable, idempotent
    - `POST` for mutations — defaults; use this when in doubt
@@ -23,7 +24,7 @@ Server functions are the API layer in this stack — there is no tRPC. Each func
 4. **Write the function**:
 
 ```ts
-// src/server/<domain>/<name>.server.ts
+// src/server/<domain>/<name>.functions.ts
 import { createServerFn } from '@tanstack/react-start'
 import { getRequestHeaders } from '@tanstack/react-start/server'
 import { env } from 'cloudflare:workers'
@@ -36,7 +37,7 @@ const Input = z.object({
 })
 
 export const <name> = createServerFn({ method: 'POST' })
-  .inputValidator(Input)
+  .validator(Input)
   .handler(async ({ data }) => {
     // For protected: uncomment
     // const auth = createAuth(env.DB)
@@ -54,7 +55,7 @@ export const <name> = createServerFn({ method: 'POST' })
 ```tsx
 // src/routes/<page>.tsx
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { <name> } from '@/server/<domain>/<name>.server'
+import { <name> } from '@/server/<domain>/<name>.functions'
 
 // Read
 const { data } = useQuery({

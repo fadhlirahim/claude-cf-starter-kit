@@ -70,10 +70,11 @@ export { SyncRoom } from './server/realtime/sync-room.do'
 3. **Handle the WebSocket upgrade in `src/entry.server.ts`** — BEFORE the TanStack Start handler. A WS upgrade returns a `101` with a `webSocket` field; it cannot be a server function (those are GET/POST RPC). Intercept in the Worker `fetch`:
 
 ```ts
+import handler from '@tanstack/react-start/server-entry'
 import { createAuth } from './server/auth'
 
 export default {
-  async fetch(request: Request, env: Env, ctx: ExecutionContext) {
+  async fetch(request, env) {
     const url = new URL(request.url)
 
     if (url.pathname === '/api/realtime' && request.headers.get('upgrade') === 'websocket') {
@@ -89,9 +90,9 @@ export default {
       return env.SYNC_ROOM.get(id).fetch(request)
     }
 
-    return handler.fetch(request, env, ctx) // existing TanStack Start handler
+    return handler.fetch(request) // TanStack Start handles everything else
   },
-}
+} satisfies ExportedHandler<Env>
 ```
 
 > Adjust the namespace key to your tenancy model (e.g. `orgId` instead of `user.id` for shared rooms). Keep the auth check — it's the only thing standing between a user and another tenant's room.

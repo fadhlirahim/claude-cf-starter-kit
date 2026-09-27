@@ -47,7 +47,7 @@ Walk the touched surface against this checklist. These are ordered by how often 
 - AI calls bypass the gateway (direct provider URL) → leaks keys, loses rate shaping.
 
 **F. Input validation**
-- Every server function has `.inputValidator(zodSchema)`; no handler trusts raw `data`.
+- Every server function has `.validator(zodSchema)`; no handler trusts raw `data`.
 - Zod strict where it matters (`z.strictObject` for request bodies that map to rows).
 
 **G. Auth & session hardening**

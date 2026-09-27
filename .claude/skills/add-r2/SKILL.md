@@ -109,7 +109,7 @@ export async function signAssetUrl(opts: {
 
 Set the secret: `wrangler secret put ASSET_SIGNING_SECRET`. Add it to `.dev.vars` for local dev (the user must edit `.dev.vars` themselves — it's blocked from writes).
 
-6. **(Optional) Upload server function** at `src/server/services/upload.server.ts`:
+6. **(Optional) Upload server function** at `src/server/services/upload.functions.ts`:
 
 ```ts
 import { createServerFn } from '@tanstack/react-start'
@@ -124,7 +124,7 @@ const Input = z.object({
 })
 
 export const upload = createServerFn({ method: 'POST' })
-  .inputValidator(Input)
+  .validator(Input)
   .handler(async ({ data }) => {
     const key = buildKey([crypto.randomUUID(), data.filename])
     const info = await uploadAsset(env.<BINDING_NAME>, key, data.body, data.contentType)

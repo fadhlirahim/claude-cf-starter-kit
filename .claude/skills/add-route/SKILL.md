@@ -37,7 +37,7 @@ Add a route: **$ARGUMENTS**
    ```tsx
    import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
    import { createFileRoute } from '@tanstack/react-router'
-   import { getThing } from '@/server/services/get-thing.server'
+   import { getThing } from '@/server/services/get-thing.functions'
 
    const thingQueryOptions = (id: string) =>
      queryOptions({ queryKey: ['thing', id], queryFn: () => getThing({ data: { id } }) })

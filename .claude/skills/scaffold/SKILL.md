@@ -39,7 +39,7 @@ export const Update<Feature>Schema = <Feature>Schema.partial().extend({ id: z.uu
 export type <Feature> = z.output<typeof <Feature>Schema>
 ```
 
-### 3. Server functions — `src/server/<feature>/<feature>.server.ts`
+### 3. Server functions — `src/server/<feature>/<feature>.functions.ts`
 
 Implement CRUD as separate exported server functions. Auth via shared middleware once you have 2+ that need it.
 
@@ -65,7 +65,7 @@ export const list<Features> = createServerFn({ method: 'GET' }).handler(async ()
 })
 
 export const get<Feature> = createServerFn({ method: 'GET' })
-  .inputValidator(z.object({ id: z.uuid() }))
+  .validator(z.object({ id: z.uuid() }))
   .handler(async ({ data }) => {
     await requireSession()
     const db = createDb(env.DB)
@@ -73,7 +73,7 @@ export const get<Feature> = createServerFn({ method: 'GET' })
   })
 
 export const create<Feature> = createServerFn({ method: 'POST' })
-  .inputValidator(Create<Feature>Schema)
+  .validator(Create<Feature>Schema)
   .handler(async ({ data }) => {
     const session = await requireSession()
     const db = createDb(env.DB)
@@ -91,7 +91,7 @@ export const create<Feature> = createServerFn({ method: 'POST' })
 ```tsx
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
-import { create<Feature>, list<Features> } from '@/server/<feature>/<feature>.server'
+import { create<Feature>, list<Features> } from '@/server/<feature>/<feature>.functions'
 
 export const Route = createFileRoute('/_authed/<feature>')({
   loader: async ({ context }) => {

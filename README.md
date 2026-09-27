@@ -91,7 +91,7 @@ The kit operates on three reinforcing layers.
 A comprehensive instruction file that teaches Claude Code the project's conventions:
 
 - **Project structure** — where every file belongs.
-- **Stack-specific patterns** — version-specific API details: TanStack Start `createServerFn` with `.inputValidator(...)`, Drizzle on D1 with `createDb(d1)` factory, better-auth's `tanstackStartCookies()` plugin order, AI Gateway routing rule, Workflow `step.do` pattern, Cron dispatch by `event.cron`.
+- **Stack-specific patterns** — version-specific API details: TanStack Start `createServerFn` with `.validator(...)`, Drizzle on D1 with `createDb(d1)` factory, better-auth's `tanstackStartCookies()` plugin order, AI Gateway routing rule, Workflow `step.do` pattern, Cron dispatch by `event.cron`.
 - **Anti-patterns** — explicit "don't do this" rules for the most common Cloudflare/Start mistakes (`process.env` in worker code, secrets in `wrangler.jsonc` `vars`, hand-edited `worker-configuration.d.ts`, AI calls that bypass the gateway, non-deterministic Workflow IDs, …).
 - **Code examples** — copy-paste patterns for routes, server functions, AI calls, R2 access, Workflows, email send, cron dispatch.
 

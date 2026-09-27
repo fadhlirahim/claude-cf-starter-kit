@@ -24,8 +24,8 @@ You write comprehensive tests for the Cloudflare + TanStack Start + Zod 4 + vite
 
 ```typescript
 import { describe, it, expect, beforeEach } from 'vitest'
-import { env } from 'cloudflare:test'  // from @cloudflare/vitest-plugin
-import { getPost } from './get-post.server'
+import { env } from 'cloudflare:workers'  // bindings from the vitest pool
+import { getPost } from './get-post.functions'
 
 describe('getPost', () => {
   beforeEach(async () => {

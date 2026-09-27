@@ -18,7 +18,7 @@ ALL AI calls in this stack go through AI Gateway. No direct provider URLs in cod
 Use this for Cloudflare-hosted models: `@cf/meta/llama-3.1-8b-instruct`, `@cf/black-forest-labs/flux-1-schnell`, `@cf/baai/bge-base-en-v1.5`, etc.
 
 ```ts
-// src/server/ai/<route-name>.server.ts
+// src/server/ai/<route-name>.functions.ts
 import { createServerFn } from '@tanstack/react-start'
 import { env } from 'cloudflare:workers'
 import { z } from 'zod/v4'
@@ -28,7 +28,7 @@ const Input = z.object({
 })
 
 export const <routeName> = createServerFn({ method: 'POST' })
-  .inputValidator(Input)
+  .validator(Input)
   .handler(async ({ data }) => {
     const response = await env.AI.run(
       '@cf/meta/llama-3.1-8b-instruct',
@@ -58,7 +58,7 @@ return new Response(stream as ReadableStream, {
 ## AI SDK flavor (OpenAI / Google through AI Gateway)
 
 ```ts
-// src/server/ai/<route-name>.server.ts
+// src/server/ai/<route-name>.functions.ts
 import { createServerFn } from '@tanstack/react-start'
 import { generateText } from 'ai'
 import { createOpenAI } from '@ai-sdk/openai'
@@ -70,7 +70,7 @@ const Input = z.object({
 })
 
 export const <routeName> = createServerFn({ method: 'POST' })
-  .inputValidator(Input)
+  .validator(Input)
   .handler(async ({ data }) => {
     const accountId = (env as unknown as Record<string, string>).CLOUDFLARE_ACCOUNT_ID
     const openai = createOpenAI({
@@ -106,7 +106,7 @@ Then check the AI Gateway dashboard → **Logs** → confirm your request appear
 
 ## Conventions
 
-- One file per AI route under `src/server/ai/`. Name: `<route-name>.server.ts`.
+- One file per AI route under `src/server/ai/`. Name: `<route-name>.functions.ts` (never `.server.ts` — routes import it, and import protection blocks `*.server.*` from the client).
 - Always validate input with Zod 4 — AI prompts are user input.
 - Cap input length aggressively (`z.string().max(N)`). AI calls cost real money.
 - For images, audio, embeddings: use `env.AI.run` with the model-specific input shape (see Cloudflare's Workers AI docs via `/docs cloudflare workers-ai`).

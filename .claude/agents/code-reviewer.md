@@ -36,7 +36,7 @@ Review code changes for correctness, security, performance, and adherence to the
 
 ### Important (should fix)
 - Convention violations (default exports outside route/config files, bare `zod` imports, `.merge()` instead of `.extend()`).
-- Missing input validation on server functions (no `.inputValidator(...)`).
+- Missing input validation on server functions (no `.validator(...)`).
 - N+1 queries in Drizzle (loop calling `db.query` instead of using relations).
 - Missing query invalidation after mutations.
 - Stale closures in React hooks.

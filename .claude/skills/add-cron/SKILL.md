@@ -28,16 +28,14 @@ Multiple expressions are fine. They all hit the same `scheduled` handler — you
 2. **Add the handler** in `src/entry.server.ts`:
 
 ```ts
-import { createStartHandler, defaultStreamHandler } from '@tanstack/react-start/server'
-
-const fetch = createStartHandler(defaultStreamHandler)
+import handler from '@tanstack/react-start/server-entry'
 
 const CRON_HOURLY = '0 * * * *'
 const CRON_NIGHTLY = '15 3 * * *'
 
 export default {
-  fetch,
-  async scheduled(event: ScheduledEvent, env: Env) {
+  fetch: (request) => handler.fetch(request),
+  async scheduled(event, env) {
     if (event.cron === CRON_HOURLY) {
       await runHourlyJob(env)
       return
@@ -55,7 +53,7 @@ export default {
     //   })
     // }
   },
-}
+} satisfies ExportedHandler<Env>
 
 async function runHourlyJob(env: Env): Promise<void> {
   // Keep this small. Heavy work belongs in a Workflow.

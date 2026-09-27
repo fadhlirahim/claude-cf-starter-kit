@@ -23,8 +23,8 @@ You build complete features across the Cloudflare-native stack: D1 schema → se
 1. **Schema** — extend `src/server/db/schema.ts` with the new table(s). SQLite types: `text`, `integer({ mode: 'boolean' | 'timestamp' })`, `real`, `blob`. Always include `id`, `createdAt`, `updatedAt`. Define `relations()` even when only one relation is used.
 2. **Migrate** — `bun db:generate` then `bun db:migrate:local`. Inspect the SQL in `drizzle/migrations/` before applying.
 3. **Validators** — Zod 4 schemas in `src/lib/validators/[feature].ts`. Base schema, `Create[Entity]Schema`, `Update[Entity]Schema`. Top-level validators (`z.email()`, `z.uuid()`). Export inferred types.
-4. **Server functions** — in `src/server/[feature]/...server.ts` (or co-located in `src/routes/api/`). Each function:
-   - `createServerFn({ method }).inputValidator(zodSchema).handler(async ({ data }) => { ... })`
+4. **Server functions** — in `src/server/[feature]/[name].functions.ts` (server-only helpers in `.server.ts`, which routes must never import). Each function:
+   - `createServerFn({ method }).validator(zodSchema).handler(async ({ data }) => { ... })`
    - Acquire bindings via `import { env } from 'cloudflare:workers'`
    - Use `createDb(env.DB)` for D1; never module-scoped.
    - For protected: wrap with a middleware that calls `auth.api.getSession({ headers: getRequestHeaders() })` and rejects when missing.
@@ -45,14 +45,14 @@ You build complete features across the Cloudflare-native stack: D1 schema → se
 - Always read `CLAUDE.md` before starting.
 - Follow all conventions (named exports, Zod 4, no `useEffect` for data, no `process.env`, AI Gateway routing, etc.).
 - Use server-fn middleware for protected procedures — don't reimplement auth checks per-handler.
-- Validate ALL inputs with Zod schemas via `.inputValidator()`.
+- Validate ALL inputs with Zod schemas via `.validator()`.
 - After mutations, invalidate the relevant query keys.
 - Keep components under 150 lines.
 - Don't add libraries not in the stack table without asking.
 
 ## When the Feature Needs AI
 
-- Add a server function in `src/server/ai/[feature].server.ts`.
+- Add a server function in `src/server/ai/[feature].functions.ts`.
 - For Workers AI models: `env.AI.run(model, input, { gateway: { id: env.AI_GATEWAY_ID } })`.
 - For OpenAI/Google via AI SDK: configure `baseURL` to the gateway URL — never the provider URL directly.
 - Stream responses by returning the `ReadableStream` directly when the model supports streaming.

@@ -10,7 +10,7 @@ Review the code changes in this project for quality, correctness, and adherence 
 
 ## Review Checklist
 
-1. **Type Safety**: No `any`. Proper Zod 4 validation (`zod/v4` import). Server functions use `.inputValidator(...)`.
+1. **Type Safety**: No `any`. Proper Zod 4 validation (`zod/v4` import). Server functions use `.validator(...)`.
 2. **Auth Security**: Protected routes use `_authed` layout `beforeLoad`. Server functions either gate on session or are explicitly public. `auth.api.getSession({ headers: getRequestHeaders() })` (without `headers`, session is anonymous).
 3. **Cloudflare Bindings**: Bindings accessed via `import { env } from 'cloudflare:workers'`. No `process.env` in worker code. No module-scoped binding access.
 4. **AI Gateway**: All AI calls route through the gateway — `env.AI.run(model, input, { gateway: { id: env.AI_GATEWAY_ID } })` for Workers AI; `baseURL` configured for AI SDK clients. No direct provider URLs.
