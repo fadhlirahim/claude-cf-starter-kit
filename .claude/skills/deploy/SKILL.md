@@ -24,7 +24,7 @@ wrangler secret list                 # prod (default)
 wrangler secret list --env stg       # staging
 ```
 
-`BETTER_AUTH_SECRET` is required. AI provider keys (`OPENAI_API_KEY`, `GOOGLE_GENERATIVE_AI_API_KEY`) are required only if AI SDK routes use them.
+`BETTER_AUTH_SECRET` is required. Also check that `BETTER_AUTH_URL` in `wrangler.jsonc` `vars` holds the real production origin (per env for staging), not the `<your-domain>` placeholder. AI provider keys (`OPENAI_API_KEY`, `GOOGLE_GENERATIVE_AI_API_KEY`) are required only if AI SDK routes use them.
 
 If a secret is missing, set it before deploying:
 
