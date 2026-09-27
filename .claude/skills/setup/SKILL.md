@@ -82,7 +82,7 @@ bun add -d \
   @tailwindcss/vite tailwindcss tw-animate-css \
   @biomejs/biome \
   drizzle-kit \
-  vitest @cloudflare/vitest-pool-workers @testing-library/react @testing-library/jest-dom jsdom \
+  vitest@^4.1 @cloudflare/vitest-pool-workers @testing-library/react @testing-library/jest-dom jsdom \
   wrangler \
   lefthook
 ```
@@ -143,7 +143,7 @@ wrangler ai gateway create <slug>
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "<app-name>",
-  "compatibility_date": "2026-04-01",
+  "compatibility_date": "2026-09-20",
   "compatibility_flags": ["nodejs_compat"],
   "main": "src/entry.server.ts",
   "observability": {
@@ -273,21 +273,20 @@ Then run `bun run prepare` once to install the hooks.
 Use the workers pool for tests that need bindings:
 
 ```ts
-import { defineWorkersConfig } from '@cloudflare/vitest-pool-workers/config'
+import { cloudflareTest } from '@cloudflare/vitest-pool-workers'
+import { defineConfig } from 'vitest/config'
 
-export default defineWorkersConfig({
-  test: {
-    poolOptions: {
-      workers: {
-        wrangler: { configPath: './wrangler.jsonc' },
-        miniflare: {
-          compatibilityFlags: ['nodejs_compat'],
-        },
-      },
-    },
-  },
+export default defineConfig({
+  plugins: [
+    cloudflareTest({
+      wrangler: { configPath: './wrangler.jsonc' },
+      miniflare: { compatibilityFlags: ['nodejs_compat'] },
+    }),
+  ],
 })
 ```
+
+`vitest` is pinned to `^4.1` — the workers pool doesn't support vitest 5 yet. The pool rejects `environment: 'jsdom'`, so component tests need a separate vitest project without `cloudflareTest()`.
 
 (For pure helper tests that don't need bindings, you can swap to vanilla `vitest/config` later — the kit standardizes on the workers pool to keep things uniform.)
 
