@@ -82,7 +82,7 @@ bun add -d \
   @tailwindcss/vite tailwindcss tw-animate-css \
   @biomejs/biome \
   drizzle-kit \
-  vitest@^4.1 @cloudflare/vitest-pool-workers @testing-library/react @testing-library/jest-dom jsdom \
+  vitest@^4.1 @cloudflare/vitest-plugin @testing-library/react @testing-library/jest-dom jsdom \
   wrangler \
   lefthook
 ```
@@ -106,7 +106,7 @@ After install, run `bun install` once to ensure lockfile.
     "noEmit": true,
     "jsx": "react-jsx",
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "types": ["vite/client"],
+    "types": ["vite/client", "@cloudflare/vitest-plugin/types"],
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
@@ -273,7 +273,7 @@ Then run `bun run prepare` once to install the hooks.
 Use the workers pool for tests that need bindings:
 
 ```ts
-import { cloudflareTest } from '@cloudflare/vitest-pool-workers'
+import { cloudflareTest } from '@cloudflare/vitest-plugin'
 import { defineConfig } from 'vitest/config'
 
 export default defineConfig({

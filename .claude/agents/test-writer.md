@@ -12,7 +12,7 @@ You write comprehensive tests for the Cloudflare + TanStack Start + Zod 4 + vite
 ## Conventions
 
 - Test files: `[name].test.ts` next to source files.
-- Framework: vitest. Worker-bound code uses `@cloudflare/vitest-pool-workers`. Pure helpers use the default pool with `cloudflare:workers` aliased to `src/test-utils/cloudflare-workers-stub.ts`.
+- Framework: vitest. Worker-bound code uses `@cloudflare/vitest-plugin`. Pure helpers use the default pool with `cloudflare:workers` aliased to `src/test-utils/cloudflare-workers-stub.ts`.
 - @testing-library/react for components.
 - No snapshot tests — they rot.
 - Don't mock internals. Mock at boundaries: external HTTP, AI Gateway calls (use `msw` or stub `fetch`), email send.
@@ -24,7 +24,7 @@ You write comprehensive tests for the Cloudflare + TanStack Start + Zod 4 + vite
 
 ```typescript
 import { describe, it, expect, beforeEach } from 'vitest'
-import { env } from 'cloudflare:test'  // from vitest-pool-workers
+import { env } from 'cloudflare:test'  // from @cloudflare/vitest-plugin
 import { getPost } from './get-post.server'
 
 describe('getPost', () => {

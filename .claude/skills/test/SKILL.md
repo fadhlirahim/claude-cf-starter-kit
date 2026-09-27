@@ -10,7 +10,7 @@ Write or run tests for: $ARGUMENTS
 ## Conventions
 
 - Test files: `[name].test.ts` next to source files
-- Framework: vitest. Worker-bound code uses `@cloudflare/vitest-pool-workers` (Miniflare-backed bindings); pure helpers use the default pool with `cloudflare:workers` aliased to `src/test-utils/cloudflare-workers-stub.ts`.
+- Framework: vitest. Worker-bound code uses `@cloudflare/vitest-plugin` (Miniflare-backed bindings); pure helpers use the default pool with `cloudflare:workers` aliased to `src/test-utils/cloudflare-workers-stub.ts`.
 - @testing-library/react for components.
 - No snapshot tests — they rot.
 - Don't mock internals. Mock at boundaries: external HTTP, AI Gateway calls, email send.

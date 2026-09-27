@@ -35,7 +35,7 @@ Look up documentation for: $ARGUMENTS
 | wrangler | CLI, config, secrets, types |
 | biome | Linting, formatting, configuration |
 | vitest | Test runner, assertions |
-| vitest-pool-workers | Workers-bound test pool |
+| vitest-plugin | Workers-bound test pool (cloudflareTest) |
 | shadcn | CLI, components.json, theming |
 | tailwind | v4 features, @theme blocks |
 

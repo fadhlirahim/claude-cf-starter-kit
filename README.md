@@ -24,7 +24,7 @@ This is **not** an app template with source code. It's the `.claude/` directory,
 | UI | [shadcn/ui](https://ui.shadcn.com) (new-york), Tailwind v4, lucide |
 | Validation | [Zod 4](https://zod.dev) |
 | Linting | [Biome](https://biomejs.dev) |
-| Test | vitest + `@cloudflare/vitest-pool-workers` |
+| Test | vitest + `@cloudflare/vitest-plugin` |
 | Pkg manager | [bun](https://bun.sh) |
 
 ## What's Included

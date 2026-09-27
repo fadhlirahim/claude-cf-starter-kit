@@ -23,7 +23,7 @@
 | UI | shadcn/ui (new-york), Tailwind v4, lucide | components.json drives shadcn CLI |
 | Validation | Zod 4 (import from `zod/v4`) | zod.dev |
 | Linting/format | Biome | biomejs.dev |
-| Test | vitest + `@cloudflare/vitest-pool-workers` | bindings via Miniflare |
+| Test | vitest + `@cloudflare/vitest-plugin` | bindings via Miniflare |
 | Package manager | bun | bun.sh |
 
 ## Commands
@@ -287,7 +287,7 @@ function PostPage() {
 
 ### Tests (vitest + Workers pool)
 
-- `@cloudflare/vitest-pool-workers` runs tests inside a Miniflare-backed Worker, so `env`, D1, KV, R2 bindings work. Configure pool in `vitest.config.ts`.
+- `@cloudflare/vitest-plugin` runs tests inside a Miniflare-backed Worker, so `env`, D1, KV, R2 bindings work. Register `cloudflareTest()` in `vitest.config.ts` plugins. Needs vitest `^4.1`.
 - Unit tests for pure helpers can use the default vitest pool with the `cloudflare:workers` import aliased to `src/test-utils/cloudflare-workers-stub.ts`.
 - D1 in tests: get a fresh in-memory database per test via the pool, run migrations once in `beforeAll`.
 - Test behavior, not implementation. No snapshot tests. Mock at boundaries (external HTTP), not internals.
