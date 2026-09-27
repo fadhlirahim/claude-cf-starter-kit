@@ -33,8 +33,6 @@ routeTree.gen.ts
 .DS_Store
 Thumbs.db
 
-# Drizzle metadata
-drizzle/meta/
 
 # Test
 coverage/
